@@ -1,5 +1,6 @@
 #include "FolderServer.h"
 #include <QDir>
+#include <QDebug>
 
 void FolderServer::loginLink(){
     link.Authorize();
@@ -26,4 +27,28 @@ void FolderServer::progress_check(qint64 now, qint64 total){
     m_now = now;
     m_total = total;
     m_progress_reports++;
+}
+
+void FolderServer::askRender(QString scene){
+    //if the file named scene exists
+    QFile sceneFile(scene);
+    if(sceneFile.exists()){
+        sceneFile.open(QIODevice::ReadOnly);
+        QByteArray massive = sceneFile.readAll();
+        link.Upload(sceneFile.fileName(), massive);
+        loop.exec();
+        //If the rendering is OK
+        renderIsDone = link.Authorized();
+    }
+}
+
+bool FolderServer::isCompletedRender(){
+    return renderIsDone;
+}
+
+void FolderServer::getListFromServer(QString sFolder, QByteArray &result){
+    loginLink();
+    link.List(sFolder, result);
+    loop.exec();
+    qDebug() << "Ici on a : " << result.data();
 }

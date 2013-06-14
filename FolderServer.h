@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QEventLoop>
 #include "../../../../Desktop/Cairnsmith13/CairnSmith/CairnSmith/Server/ClientLib/sheer_cloud.h"
+#include <QFile>
 
 class FolderServer : public QObject {
     Q_OBJECT
@@ -45,6 +46,7 @@ public:
     qint64 m_now;
     qint64 m_total;
     int m_progress_reports;
+    bool renderIsDone;
 
 public slots:
     /**
@@ -71,6 +73,36 @@ public slots:
      */
     void progress_check(qint64 now, qint64 total);
 
+    /**
+     * @brief askRender
+     * This slot helps to request a render to the server
+     * @param scene is the name of the scene of the rendering
+     */
+    void askRender(QString scene);
+
+    /**
+     * @brief fDragAndDrop
+     * When a library is used from the server directory and not exists in
+     * the local directory of the user, the library is copy/paste to local
+     * @param sLibrary is the used Library
+     */
+    //void fDragAndDrop(QString sLibrary);
+
+    /**
+     * @brief getListFromServer
+     * This helps to get the list of files in a folder locate on the server
+     * @param sFolder is the QString  path of the folder locate on the remote
+     * @param result is the QByteArray of the data received
+     */
+    void getListFromServer(QString sFolder, QByteArray &result);
+
+private:
+    /**
+     * @brief isCompletedRender
+     * This helps to set if the rendering is achieved
+     * @return a boolean.
+     */
+    bool isCompletedRender();
 };
 
 #endif // FOLDERSERVER_H
