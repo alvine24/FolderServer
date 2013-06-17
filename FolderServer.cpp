@@ -50,5 +50,24 @@ void FolderServer::getListFromServer(QString sFolder, QByteArray &result){
     loginLink();
     link.List(sFolder, result);
     loop.exec();
-    qDebug() << "Ici on a : " << result.data();
+    QString myResult = result.data();
+    QStringList list = myResult.split("\n");
+    foreach(QString s, list){
+        if(s.contains('/')){
+            qDebug() << "Ici on a : " << s;
+            getListFileServer(s);
+        }
+    }
+}
+
+void FolderServer::getListFileServer(QString sFilepath){
+    QByteArray result;
+    link.Download(sFilepath, result);
+    //save result into temp folder
+    QString myTempPath = QDir::tempPath();
+    QFile myFile(myTempPath+'/'+sFilepath);
+    qDebug() << "le chemin : " << myTempPath+'/'+sFilepath;
+    myFile.open(QIODevice::WriteOnly);
+    myFile.write(result);
+    myFile.close();
 }

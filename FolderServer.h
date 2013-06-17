@@ -96,6 +96,8 @@ public slots:
      */
     void getListFromServer(QString sFolder, QByteArray &result);
 
+    void getListFileServer(QString sFilepath);
+
 private:
     /**
      * @brief isCompletedRender
