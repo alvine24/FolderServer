@@ -19,7 +19,9 @@
 #include <QFile>
 #include <QEventLoop>
 #include "../../../../Desktop/Cairnsmith13/CairnSmith/CairnSmith/Server/ClientLib/sheer_cloud.h"
-#include <QFile>
+#include <QDir>
+#include <QHash>
+#include <QList>
 
 class FolderServer : public QObject {
     Q_OBJECT
@@ -96,7 +98,43 @@ public slots:
      */
     void getListFromServer(QString sFolder, QByteArray &result);
 
+    /**
+     * @brief getListFileServer
+     * This helps to save the file in a local folder
+     * @param sFilepath is the filename with the path
+     */
     void getListFileServer(QString sFilepath);
+
+    /**
+     * @brief listFiles
+     * This function helps to build a list of files in a
+     * defined folder
+     * @param mDir is the name or path of the folder
+     * @return the result of this function is a QHash of
+     * the name of each file and their MD5 sum
+     */
+    QHash<QString, QString> listFiles(QString mDir);
+
+    /**
+     * @brief compareFileList
+     * This function compare the QHash of two list of files
+     * @param local is the QHash of files list on local folder
+     * @param remote is the QHash of files list on the server folder
+     * @return is a QList of the file that are not on the remote or server
+     */
+    QList<QString> compareFileList(QHash<QString, QString> local, QHash<QString, QString> remote);
+
+    /**
+     * @brief saveToUserFolder
+     * This function helps to save a file to the user local folder
+     * @param filename is the name of the file that will
+     * be saved to the local machine
+     * @param data is the content of the file that has been retrieve
+     * from the remote
+     * @return a boolean that helps to know if the file has been
+     * successfully saved
+     */
+    bool saveToUserFolder(QString &filename, QIODevice *data);
 
 private:
     /**
