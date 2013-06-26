@@ -23,6 +23,8 @@
 #include <QHash>
 #include <QList>
 #include "FileHash.h"
+#include <QtTest/QtTest>
+#include <QtTest/QTest>
 
 class FolderServer : public QObject {
     Q_OBJECT
@@ -50,6 +52,13 @@ public:
     qint64 m_total;
     int m_progress_reports;
     bool renderIsDone;
+
+    /**
+     * @brief isCompletedRender
+     * This helps to set if the rendering is achieved
+     * @return a boolean.
+     */
+    bool isCompletedRender();
 
 public slots:
     /**
@@ -138,12 +147,6 @@ public slots:
     bool saveToUserFolder(QString &filename, QIODevice *data);
 
 private:
-    /**
-     * @brief isCompletedRender
-     * This helps to set if the rendering is achieved
-     * @return a boolean.
-     */
-    bool isCompletedRender();
 
     FileHash m_oHashMD5;
     QHash<QString, QString> mylist;

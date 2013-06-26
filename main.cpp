@@ -13,7 +13,8 @@ int main(int argc, char *argv[])
     //myDial.show();
     //QByteArray result;
     //myFolder.getListFromServer("very/huge", result);
-    myFolder.askRender("very/not_needed/file_too.txt");
+    myFolder.askRender("very/not_needed/scene.txt");
 
+    qDebug() << "IsRender done? :" << myFolder.isCompletedRender();
     return app.exec();
 }

@@ -39,21 +39,18 @@ void FolderServer::askRender(QString scene){
     loop.exec();
     qDebug() << "The result of Rendering :" << rendering;
 
-    JobResult result;
+    JobResult result = false;
 
-    link.Progress(rendering, result);
-    loop.exec();
-    qDebug() << "The result :" << result;
-    //if the file named scene exists
-    /*QFile sceneFile(scene);
-    if(sceneFile.exists()){
-        sceneFile.open(QIODevice::ReadOnly);
-        QByteArray massive = sceneFile.readAll();
-        link.Upload(sceneFile.fileName(), massive);
+    while (!result){
+        link.Progress(rendering, result);
         loop.exec();
-        //If the rendering is OK
-        renderIsDone = link.Authorized();
-    }*/
+        qDebug() << "The result of Progress :" << result;
+        Sleep(1020);
+    }
+    if(result)
+        renderIsDone = true;
+    else
+        renderIsDone = false;
 }
 
 bool FolderServer::isCompletedRender(){
