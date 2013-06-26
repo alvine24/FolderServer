@@ -1,6 +1,7 @@
 #include <QApplication>
 #include "FolderServer.h"
 #include <QDebug>
+#include "Dialog.h"
 
 
 int main(int argc, char *argv[])
@@ -8,8 +9,11 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     FolderServer myFolder;
     //myFolder.uploadFolder("C:/Users/sheerServer/Cairnsmith/abc", "");
-    QByteArray result;
-    myFolder.getListFromServer("very/much", result);
+    //Dialog myDial;
+    //myDial.show();
+    //QByteArray result;
+    //myFolder.getListFromServer("very/huge", result);
+    myFolder.askRender("very/not_needed/file_too.txt");
 
     return app.exec();
 }

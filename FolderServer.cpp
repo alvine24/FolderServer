@@ -1,4 +1,5 @@
 #include "FolderServer.h"
+#include "LocalData.h"
 #include <QDir>
 #include <QDebug>
 
@@ -7,7 +8,8 @@ void FolderServer::loginLink(){
     loop.exec();
 }
 
-void FolderServer::uploadFolder(QString myFolder, QString serverPath){
+bool FolderServer::uploadFolder(QString myFolder, QString serverPath){
+    bool res = false;
     QDir dir(myFolder);
     QFileInfoList list = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo finfo, list){
@@ -18,9 +20,11 @@ void FolderServer::uploadFolder(QString myFolder, QString serverPath){
             //loginLink();
             link.Upload(serverPath+"/"+finfo.fileName(), massive);
             loop.exec();
+            res = true;
         }else
             uploadFolder(finfo.absoluteFilePath(), serverPath + "/" + finfo.fileName());
     }
+    return res;
 }
 
 void FolderServer::progress_check(qint64 now, qint64 total){
@@ -30,8 +34,18 @@ void FolderServer::progress_check(qint64 now, qint64 total){
 }
 
 void FolderServer::askRender(QString scene){
+    JobID rendering;
+    link.Job(scene,rendering);
+    loop.exec();
+    qDebug() << "The result of Rendering :" << rendering;
+
+    JobResult result;
+
+    link.Progress(rendering, result);
+    loop.exec();
+    qDebug() << "The result :" << result;
     //if the file named scene exists
-    QFile sceneFile(scene);
+    /*QFile sceneFile(scene);
     if(sceneFile.exists()){
         sceneFile.open(QIODevice::ReadOnly);
         QByteArray massive = sceneFile.readAll();
@@ -39,7 +53,7 @@ void FolderServer::askRender(QString scene){
         loop.exec();
         //If the rendering is OK
         renderIsDone = link.Authorized();
-    }
+    }*/
 }
 
 bool FolderServer::isCompletedRender(){
@@ -47,7 +61,7 @@ bool FolderServer::isCompletedRender(){
 }
 
 void FolderServer::getListFromServer(QString sFolder, QByteArray &result){
-    loginLink();
+    //loginLink();
     link.List(sFolder, result);
     loop.exec();
     QString myResult = result.data();
@@ -63,13 +77,17 @@ void FolderServer::getListFromServer(QString sFolder, QByteArray &result){
 void FolderServer::getListFileServer(QString sFilepath){
     QByteArray result;
     link.Download(sFilepath, result);
+    loop.exec();
     //save result into temp folder
-    QString myTempPath = QDir::tempPath(); //here we set the folder in which server's files will be saved
+    QString myTempPath = QDir::homePath()+SERVER_FOLDER; //here we set the folder in which server's files will be saved
     QFile myFile(myTempPath+'/'+sFilepath);
     qDebug() << "le chemin : " << myTempPath+'/'+sFilepath;
-    myFile.open(QIODevice::WriteOnly);
-    myFile.write(result);
-    myFile.close();
+    if(!myFile.open(QIODevice::WriteOnly)){
+        qDebug() << "Failed to open : " << myFile.fileName();
+    }else {
+        myFile.write(result.data());
+        myFile.close();
+    }
 }
 
 QHash<QString, QString> FolderServer::listFiles(QString mDir){
@@ -83,7 +101,7 @@ QHash<QString, QString> FolderServer::listFiles(QString mDir){
             //Calcul MD5 and store in a QHash
             QString m_sResValCryptoMD5;
             m_oHashMD5.SetInFile(finfo.absoluteFilePath());
-            m_oHashMD5.SetOutFile("C:/Data/OutFile");
+            m_oHashMD5.SetOutFile(QDir::tempPath());
             m_oHashMD5.CalculateCryptoMD5();
             if(m_oHashMD5.IsOk() == true){
                 m_sResValCryptoMD5 = m_oHashMD5.GetResCryptoMD5();

@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QHash>
 #include <QList>
+#include "FileHash.h"
 
 class FolderServer : public QObject {
     Q_OBJECT
@@ -65,7 +66,7 @@ public slots:
      * @param myFolder is the path of the main folder at the client side
      * @param serverPath is the path of the folder at the server side
      */
-    void uploadFolder(QString myFolder, QString serverPath);
+    bool uploadFolder(QString myFolder, QString serverPath);
 
     /**
      * @brief progress_check
@@ -143,6 +144,9 @@ private:
      * @return a boolean.
      */
     bool isCompletedRender();
+
+    FileHash m_oHashMD5;
+    QHash<QString, QString> mylist;
 };
 
 #endif // FOLDERSERVER_H
